@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script>
+		var props;	
+		var dev;
+
+		function connect()
+		{
+			let sUUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+			let cUUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+			var url = window.location.search;
+			var url = new URLSearchParams(url);
+			var str = url.get('bt');
+		
+			navigator.bluetooth.requestDevice({filters: [{services: [sUUID]}, {name: [str]}]})
+			.then(device => {
+				print("< i > Connecting...\n");
+				dev = device;
+				return device.gatt.connect();
+			})
+			.then(server => {
+				return server.getPrimaryService(sUUID);
+			})
+			.then(service => {
+				return service.getCharacteristic(cUUID);
+			})
+			.then(characteristic => {
+			props = characteristic;
+				return props.startNotifications().then(_ => {
+				print("< / > Connected to: " + dev.name + "\n");
+				props.addEventListener('characteristicvaluechanged',
+				notiHandler);
+				});
+			})
+			.catch(error => {
+				console.log("< x > " + error);
+			});
+		}
+		
+		function disconnect()
+		{
+			if (props) {
+				props.stopNotifications()
+			.then(_ => {
+				print("< / > Disconnected!\n");
+				props.removeEventListener('characteristicvaluechanged',
+				notiHandler);
+				return dev.gatt.disconnect();
+			})
+			.catch(error => {
+				console.log('< x > ' + error);
+			});
+			}
+		}
+		
+		function notiHandler(event)
+		{
+			let value = event.target.value;
+			print(dev.name + "> " + new TextDecoder().decode(value));
+		}
+		
+		function send()
+		{
+			var data = document.getElementById("input").value;
+			print("You> " + data + "\n");
+			props.writeValue(str2ab(data+"\n"))
+			document.getElementById("input").value = "";
+		}
+		
+		function str2ab(str)
+		{
+			var buf = new ArrayBuffer(str.length);
+			var bufView = new Uint8Array(buf);
+			for (var i = 0, l = str.length; i < l; i++) {
+				bufView[i] = str.charCodeAt(i);
+			}
+			return buf;
+		}
+		
+		function print(str)
+		{
+			document.getElementById("arena").value += str;
+		}
+		</script>
+
+
+		<title>BLE SerialTerm</title>
+	</head>
+
+	<body>
+		<div class="header">BLE Serial Terminal</div>
+		<div class="terminal">
+			<textarea id="arena" readonly="" class="terminal" rows="20" cols="40"></textarea>
+		</div>
+		<div class="footer">
+			<input id="input" type="text" class="input" placeholder="New Message >...">
+			<button onclick="send()">>>></button>
+			<button onclick="connect()">< / ></button>
+			<button onclick="disconnect()">< x ></button>
+			</div>
+		</div>
+	</body>
+</html>
