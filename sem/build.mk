@@ -18,7 +18,8 @@ USE_DEFAULT_RESOURCES	:= 0
 
 include $(PROJECT_DIR)/config.mk
 include $(PROJECT_DIR)/resources/build.mk
-#include $(PROJECT_DIR)/bt-hm-10/build.mk
+include $(PROJECT_DIR)/bt-hm-10/build.mk
+include $(PROJECT_DIR)/pzem004t/build.mk
 
 DIR		:= $(PROJECT_DIR)
 include mk/obj.mk

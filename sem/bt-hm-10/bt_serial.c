@@ -114,6 +114,7 @@ status_t bt_serial_driver_setup(void)
 	ret |= sysclk_register_config_clk_callback(&bt_handle);
 	dev.write = &bt_serial_write;
 	dev.read = &bt_serial_read;
+	ret |= stdout_register(&bt_serial_write);
 	stdbt = &dev;
 	return ret;
 }
@@ -131,6 +132,4 @@ status_t bt_serial_driver_exit(void)
 	return ret;
 }
 
-#if CONSOLE_SERIAL==1
 INCLUDE_DRIVER(bt, bt_serial_driver_setup, bt_serial_driver_exit, 0, 255, 255);
-#endif

@@ -19,12 +19,11 @@
 #include <driver/sysclk.h>
 #include <hal/clint.h>
 #include <hal/gpio.h>
+#include "pzem004t/pzem004t.h"
 
 static unsigned long long t;
 static unsigned int ticks = 16384;
 static gpio_port_t bled;
-
-char *banner = "BT Loopback!\n< ! > Type anything...\n\n";
 
 static void test()
 {
@@ -46,18 +45,18 @@ void plug()
 	gpio_pin_mode(&bled, out);
 	gpio_pin_clear(&bled);
 
+	pzem_update(0x00);
+
 	t = clint_read_time();
 	clint_config_tcmp(0, (t + ticks));
 	arch_ei_mtime();
 
-	printf("%s", banner);
 	return;
 }
 
 void play()
 {
-	char c;
-	fgetc(stdin, &c);
-	fputc(stdout, c);
+	printf("Voltage: %u", (uint16_t)pzem_voltage());
+	arch_wfi();
 	return;
 }

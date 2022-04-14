@@ -51,7 +51,7 @@ module_t uart0 =
 	.id = uart | 0,
 	.baddr = 0x10013000,
 	.stride = 0x20,
-	.clk = 115200,
+	.clk = 9600,
 	.interrupt[0] = {int_plat, 3, int_rising_edge},
 };
 

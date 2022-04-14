@@ -12,39 +12,38 @@
 #include <status.h>
 #include <plat_defines.h>
 #include <resource.h>
+#include "../pzem004t/pzem004t.h"
 
-/*
 static uint8_t uart0pins[] = {16, 17};
 static pinmux_t uart0 = addpins(0, uart0pins, serial);
-swdev_t consoleUart =
+swdev_t pzemUart =
 {
-	.swdev_id = console_uart,
+	.swdev_id = pzem004t_uart,
 	.hwdev_id = uart | 0,
 	.pmux = &uart0
 };
-*/
 
 static uint8_t uart1pins[] = {18, 23};
 static pinmux_t uart1 = addpins(0, uart1pins, serial);
 swdev_t btuart =
 {
-	.swdev_id = console_uart,
+	.swdev_id = bt_uart,
 	.hwdev_id = uart | 1,
 	.pmux = &uart1
 };
 
 sw_devid_t terra_devs[] =
 {
-	console_uart,
-	//bt_uart
+	pzem004t_uart,
+	bt_uart
 };
 
 visor_t terravisor = add_visor_devs(terra_devs);
 
 swdev_t *sw_devs[] =
 {
-	//&consoleUart,
-	&btuart
+	&btuart,
+	&pzemUart
 };
 
 sp_t software_prop =
